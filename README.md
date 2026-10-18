@@ -23,7 +23,7 @@ http://服务器公网IP:8787/#i=邀请码
 
 - key 只存在服务器上，网页里看不到。
 - 没有邀请码的人也能打开页面，但只能用模板出题，不会花你的额度。
-- 默认模型 `gpt-5.6-terra`，接口 `https://v2-as.pincc.ai/v1`。用 `LLM_MODEL`、`LLM_BASE_URL` 可以换。
+- 默认模型依次是 `gpt-5.6-terra`、`gpt-5.6-sol`、`gpt-5.6`、`gpt-6-sol`：前一个出错（5xx 或限流）就自动换下一个，出错的模型 60 秒内跳过。接口 `https://v2-as.pincc.ai/v1`。用 `LLM_MODEL`（逗号分隔）、`LLM_BASE_URL` 可以换。
 - 默认限额：全站每天 3000 次模型调用（完整玩一遍约 17 次），每个 IP 每分钟 30 次、每天 200 次。用 `DAILY_CAP`、`IP_PER_MIN`、`IP_PER_DAY` 可以改。
 
 更新：`git pull`，然后停掉旧进程（`pkill -f "node app.js"`）再按上面的命令启动一次。

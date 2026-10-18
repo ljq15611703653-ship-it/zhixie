@@ -781,10 +781,15 @@ $('#again').onclick=()=>{hist=[];aiCount=0;show('s-q');ask();};
 /* ---------- 海报：直接画在 canvas 上，转成图片，手机长按可存 ---------- */
 const SERIF='"Noto Serif SC","Songti SC","STSong","SimSun",serif',SANS='"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif',MONO='"JetBrains Mono",Consolas,monospace';
 const NO_START='，。、！？；：）》」』”’…—,.!?;:)';
+/* 折行：英文单词和数字不拆开，行首标点挂到上一行末尾 */
 function wrap(g,text,maxW){
+  const toks=text.match(/[A-Za-z0-9][A-Za-z0-9.\-_%']*|\s+|./gu)||[];
   const out=[];let line='';
-  for(const ch of text){const t=line+ch;
-    if(g.measureText(t).width>maxW&&line){if(NO_START.includes(ch)){out.push(t);line='';}else{out.push(line);line=ch;}}else line=t;}
+  for(const tk of toks){
+    const t=line+tk;
+    if(!line||g.measureText(t).width<=maxW||NO_START.includes(tk[0])){line=t;continue;}
+    out.push(line.replace(/\s+$/,''));line=tk.trim()?tk:'';
+  }
   if(line) out.push(line);return out;
 }
 function spaced(g,text,x,y,sp,align){
@@ -797,6 +802,7 @@ async function fonts(text){
   await Promise.all(specs.map(f=>document.fonts.load(f,text).catch(()=>{})));
 }
 async function poster(d,a,ai){
+  d={...d,codename:fixSp(d.codename),role:fixSp(d.role),epic:fixSp(d.epic),abilities:d.abilities.map(fixSp)};
   const P=CLS[d.cls],W=1080,IH=900,pad=76,maxW=W-pad*2,seed=hash(a.name+a.job+a.skill);
   const serial='NO.'+String(seed%10000000).padStart(7,'0');
   const LEAD='智械危机时，你是：';
